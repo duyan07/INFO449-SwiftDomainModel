@@ -116,6 +116,10 @@ public class Job {
             self.type = .Salary(UInt(newSalary.rounded()))
         }
     }
+    
+    public func convert() -> Void {
+        
+    }
 }
 
 ////////////////////////////////////
