@@ -109,6 +109,16 @@ class JobTests: XCTestCase {
         
         XCTAssert(job.calculateIncome(10) == 431)
     }
+    
+    func testConvertHourlyToSalary() {
+        let job = Job(title: "Engineer", type: Job.JobType.Hourly(50.0))
+        job.convert()
+        if case .Salary(let amount) = job.type {
+            XCTAssertEqual(amount, 100000)
+        } else {
+            XCTFail("Job was not converted to Salary type")
+        }
+    }
         
     static var allTests = [
         ("testCreateSalaryJob", testCreateSalaryJob),
@@ -122,6 +132,7 @@ class JobTests: XCTestCase {
         ("testZeroJobIncome", testZeroJobIncome),
         ("testZeroSalaryRaise", testZeroSalaryRaise),
         ("testZeroHourlyRaise", testZeroHourlyRaise),
-        ("testMultipleRaises", testMultipleRaises)
+        ("testMultipleRaises", testMultipleRaises),
+        ("testConvertHourlyToSalary", testConvertHourlyToSalary)
     ]
 }

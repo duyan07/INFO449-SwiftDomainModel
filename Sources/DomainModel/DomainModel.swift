@@ -118,7 +118,13 @@ public class Job {
     }
     
     public func convert() -> Void {
-        
+        switch type {
+        case.Hourly(let hourlyRate):
+            let annualSalary = UInt((hourlyRate * 2000).rounded())
+            self.type = .Salary(annualSalary)
+        case .Salary(let salary):
+            break
+        }
     }
 }
 
