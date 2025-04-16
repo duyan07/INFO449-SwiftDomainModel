@@ -15,7 +15,7 @@ public struct Money {
     static let validCurrencies: [String] = ["USD", "GBP", "EUR", "CAN"]
     static let exchangeRates: [String: Double] = [
         "USD": 1.0,
-        "GBP": 0.8,
+        "GBP": 0.5,
         "EUR": 1.5,
         "CAN": 1.25
     ]
@@ -54,8 +54,8 @@ public struct Money {
         if self.currency == other.currency {
             return Money(amount: self.amount + other.amount, currency: self.currency)
         } else {
-            let convertedOther = other.convert(self.currency)
-            return Money(amount: self.amount + convertedOther.amount, currency: self.currency)
+            let convertedSelf = self.convert(other.currency)
+            return Money(amount: convertedSelf.amount + other.amount, currency: other.currency)
         }
     }
     
@@ -63,8 +63,8 @@ public struct Money {
         if self.currency == other.currency {
             return Money(amount: self.amount - other.amount, currency: self.currency)
         } else {
-            let convertedOther = other.convert(self.currency)
-            return Money(amount: self.amount - convertedOther.amount, currency: self.currency)
+            let convertedSelf = self.convert(other.currency)
+            return Money(amount: convertedSelf.amount - other.amount, currency: other.currency)
         }
     }
 }
@@ -95,7 +95,7 @@ public class Job {
         }
     }
     
-    public func raise(byAmount: Double) {
+    public func raise(byAmount: Double) -> Void {
         switch type {
         case .Hourly(var hourlyRate):
             hourlyRate += byAmount
@@ -106,13 +106,17 @@ public class Job {
         }
     }
     
-    public func raise(byPercent: Double) {
+    public func raise(byPercent: Double) -> Void {
         switch type {
         case .Hourly(let hourlyRate):
-            let newHourlyRate = hourlyRate * (1 + byPercent / 100)
+            print(hourlyRate)
+            let newHourlyRate = hourlyRate * (1 + byPercent)
+            print(newHourlyRate)
             self.type = .Hourly(newHourlyRate)
         case .Salary(let salary):
-            let newSalary = Double(salary) * (1 + byPercent / 100)
+            print(salary)
+            let newSalary = Double(salary) * (1 + byPercent)
+            print(newSalary)
             self.type = .Salary(UInt(newSalary.rounded()))
         }
     }
@@ -125,8 +129,30 @@ public class Person {
     var firstName: String
     var lastName: String
     var age: Int
-    var job: Job?
-    var spouse: Person?
+    
+    private var _job: Job?
+    var job: Job? {
+        get {
+            return _job
+        }
+        set {
+            if age >= 16 {
+                _job = newValue
+            }
+        }
+    }
+    
+    private var _spouse: Person?
+    var spouse: Person? {
+        get {
+            return _spouse
+        }
+        set {
+            if age >= 18 {
+                _spouse = newValue
+            }
+        }
+    }
     
     init(firstName: String, lastName: String, age: Int) {
         self.firstName = firstName
@@ -135,7 +161,7 @@ public class Person {
     }
     
     public func toString() -> String {
-        return "[Person: firstName: \(firstName) lastName: \(lastName) age: \(age) job: \(String(describing: job?.type)) spouse: \(String(describing: spouse?.firstName))]"
+        return "[Person: firstName:\(firstName) lastName:\(lastName) age:\(age) job:\(String(describing: job?.type)) spouse:\(String(describing: spouse?.firstName))]"
     }
 }
 
@@ -143,5 +169,35 @@ public class Person {
 // Family
 //
 public class Family {
+    var members: [Person]
     
+    init(spouse1: Person, spouse2: Person) {
+        guard spouse1.spouse == nil && spouse2.spouse == nil else {
+            fatalError("At least one spouse is already married")
+        }
+        spouse1.spouse = spouse2
+        spouse2.spouse = spouse1
+        members = [spouse1, spouse2]
+    }
+    
+    public func haveChild(_ child: Person) -> Bool {
+        for member in members {
+            if member.spouse != nil && member.age > 21 {
+                members.append(child)
+                return true
+            }
+        }
+        return false
+    }
+    
+    public func householdIncome() -> Int {
+        var householdIncome = 0
+        for member in members {
+            if let job = member.job {
+                let annualIncome = job.calculateIncome(2000)
+                householdIncome += annualIncome
+            }
+        }
+        return householdIncome
+    }
 }
