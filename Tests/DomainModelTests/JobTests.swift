@@ -49,9 +49,9 @@ class JobTests: XCTestCase {
     
     func testJobTitleChange() {
         let job = Job(title: "Engineer", type: Job.JobType.Salary(10000))
-        XCTAssert(job.title == "Engineer")
-        job.title = "Manager"
-        XCTAssert(job.title == "Manager")
+        XCTAssert(job.getTitle() == "Engineer")
+        job.setTitle("Manager")
+        XCTAssert(job.getTitle() == "Manager")
     }
     
     func testZeroHoursIncome() {

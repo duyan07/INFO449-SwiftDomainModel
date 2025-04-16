@@ -9,8 +9,8 @@ struct DomainModel {
 // Money
 //
 public struct Money {
-    var amount: Int
-    var currency: String
+    private(set) var amount: Int
+    private(set) var currency: String
     
     static let validCurrencies: [String] = ["USD", "GBP", "EUR", "CAN"]
     static let exchangeRates: [String: Double] = [
@@ -73,8 +73,8 @@ public struct Money {
 // Job
 //
 public class Job {
-    var title: String
-    var type: JobType
+    private var title: String
+    private(set) var type: JobType
     
     public enum JobType {
         case Hourly(Double)
@@ -84,6 +84,14 @@ public class Job {
     init(title: String, type: JobType) {
         self.title = title
         self.type = type
+    }
+    
+    public func getTitle() -> String {
+        return title
+    }
+    
+    public func setTitle(_ newTitle: String) -> Void {
+        title = newTitle
     }
     
     public func calculateIncome(_ hours: Int) -> Int {
@@ -122,7 +130,7 @@ public class Job {
         case.Hourly(let hourlyRate):
             let annualSalary = UInt((hourlyRate * 2000).rounded())
             self.type = .Salary(annualSalary)
-        case .Salary(let salary):
+        case .Salary(_):
             break
         }
     }
@@ -132,12 +140,12 @@ public class Job {
 // Person
 //
 public class Person {
-    var firstName: String
-    var lastName: String
-    var age: Int
+    private var firstName: String
+    private var lastName: String
+    private var age: Int
     
     private var _job: Job?
-    var job: Job? {
+    public var job: Job? {
         get {
             return _job
         }
@@ -149,7 +157,7 @@ public class Person {
     }
     
     private var _spouse: Person?
-    var spouse: Person? {
+    public var spouse: Person? {
         get {
             return _spouse
         }
@@ -166,6 +174,10 @@ public class Person {
         self.age = age
     }
     
+    public func getAge() -> Int {
+        return age
+    }
+    
     public func toString() -> String {
         return "[Person: firstName:\(firstName) lastName:\(lastName) age:\(age) job:\(String(describing: job?.type)) spouse:\(String(describing: spouse?.firstName))]"
     }
@@ -175,7 +187,7 @@ public class Person {
 // Family
 //
 public class Family {
-    var members: [Person]
+    private var members: [Person]
     
     init(spouse1: Person, spouse2: Person) {
         guard spouse1.spouse == nil && spouse2.spouse == nil else {
@@ -188,7 +200,7 @@ public class Family {
     
     public func haveChild(_ child: Person) -> Bool {
         for member in members {
-            if member.spouse != nil && member.age > 21 {
+            if member.spouse != nil && member.getAge() > 21 {
                 members.append(child)
                 return true
             }
