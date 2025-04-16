@@ -109,14 +109,10 @@ public class Job {
     public func raise(byPercent: Double) -> Void {
         switch type {
         case .Hourly(let hourlyRate):
-            print(hourlyRate)
             let newHourlyRate = hourlyRate * (1 + byPercent)
-            print(newHourlyRate)
             self.type = .Hourly(newHourlyRate)
         case .Salary(let salary):
-            print(salary)
             let newSalary = Double(salary) * (1 + byPercent)
-            print(newSalary)
             self.type = .Salary(UInt(newSalary.rounded()))
         }
     }
